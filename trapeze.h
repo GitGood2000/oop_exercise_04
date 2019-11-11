@@ -46,7 +46,7 @@ double trapeze<T>::area() const {
 
 template<class T>
 void trapeze<T>::print(std::ostream& os) const {
-  os << "Trapeze ";
+  os << "Trapezoid ";
   for(int i = 0; i < 4; ++i){
     os << "[" << vertices[i] << "]";
     if(i + 1 != 4){

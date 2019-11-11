@@ -64,7 +64,7 @@ template<size_t ID, class T>
 template<size_t ID, class T>
   vertex<double> rcrsv_center(const T& t) {
   if constexpr (ID < std::tuple_size_v<T>){
-      return  sngl_center<ID>(t) + rcrsv_center<ID+1>(t);
+      return  {sngl_center<ID>(t).x + rcrsv_center<ID+1>(t).x, sngl_center<ID>(t).y + rcrsv_center<ID+1>(t).y};
     } else {
     vertex<double> v;
     v.x = 0;
@@ -75,8 +75,8 @@ template<size_t ID, class T>
 
 template<class T>
 std::enable_if_t<is_figurelike_tuple_v<T>, vertex<double>>
-  center(const T& fake) {
-  return rcrsv_center<0>(fake);
+  center(const T& tuple) {
+  return rcrsv_center<0>(tuple);
 }
 
 //area
@@ -99,7 +99,7 @@ std::enable_if_t<has_area_method_v<T>, double>
 }
 
 template<size_t ID, class T>
-  double sngl_center(const T& t) {
+  double sngl_area(const T& t) {
   const auto& a = std::get<0>(t);
   const auto& b = std::get<ID - 1>(t);
   const auto& c = std::get<ID>(t);
@@ -111,11 +111,17 @@ template<size_t ID, class T>
 }
 
 template<size_t ID, class T>
-  double rcrsv_center(const T& t) {
+  double rcrsv_area(const T& t) {
   if constexpr (ID < std::tuple_size_v<T>){
-      return sngl_center<ID>(t) + rcrsv_center<ID + 1>(t);
+      return sngl_area<ID>(t) + rcrsv_area<ID + 1>(t);
     }
   return 0;
+}
+
+template<class T>
+std::enable_if_t<is_figurelike_tuple_v<T>, double>
+  area(const T& tuple) {
+  return rcrsv_area<2>(tuple);
 }
 
 //print
@@ -139,7 +145,10 @@ std::enable_if_t<has_print_method_v<T>, void>
 
 template<size_t ID, class T>
   void sngl_print(const T& t) {
-  std::cout << std::get<ID>(t);
+  std::cout << "[" << std::get<ID>(t) << "]";
+  if (ID < 3){
+    std::cout << " ";
+  }
   return ;
 }
 
@@ -151,6 +160,12 @@ template<size_t ID, class T>
       return ;
     }
   return;
+}
+
+template<class T>
+std::enable_if_t<is_figurelike_tuple_v<T>, void>
+  print(const T& tuple) {
+  return rcrsv_print<0>(tuple);
 }
 
 #endif // D_TEMPLATES_H_
